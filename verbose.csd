@@ -4,6 +4,8 @@ rslider bounds(203, 162, 100, 100), channel("gain"), range(0, 1, 0, 1, .01), tex
 rslider bounds(103, 162, 100, 100), channel("Mix"), range(0, 1, 0, 1, .01), text("Mix"), trackerColour("lime"), outlineColour(0, 0, 0, 50), textColour("black")
 rslider bounds(3, 162, 100, 100), channel("Bright"), range(0, 1, 0, 1, .01), text("Bright"), trackerColour("lime"), outlineColour(0, 0, 0, 50), textColour("black")
 rslider bounds(103, 62, 100, 100), channel("Size"), range(0, 1, 0, 1, .01), text("Size"), trackerColour("lime"), outlineColour(0, 0, 0, 50), textColour("black")
+rslider bounds(28, 87, 50, 50), channel("FB"), range(0, .95, 0, .95, .01), text("FB"), trackerColour("lime"), outlineColour(0, 0, 0, 50), textColour("black")
+rslider bounds(228, 87, 50, 50), channel("Rate"), range(0, 1, 0, .9, .01), text("Rate"), trackerColour("lime"), outlineColour(0, 0, 0, 50), textColour("black")
 
 </Cabbage>
 <CsoundSynthesizer>
@@ -102,27 +104,27 @@ xout  a1*ksqtwo*(ksintheta-kcostheta),a2*ksqtwo*(ksintheta+kcostheta)
 
 endop
 
-opcode StanyVerb, aa, aakkkkk
-a1,a2,ksize,kFB,kVF,kVWD,khp xin
+opcode StanyVerb, aa, aakkkkkk
+a1,a2,ksize,kFB,kVF,kVWD,khp,krate xin
 
 aL, aFH, ab   svfilter a1, 100+khp, .0
 
 denorm aFH
 
 ada StanyDelay aFH, .2878+ksize, kFB
-adb StanyDelay aFH, .1852+ksize, kFB+.01
-adc StanyDelay aFH, .1731+ksize, kFB+.02
-add StanyDelay aFH, .1526+ksize, kFB+.03
-ade StanyDelay aFH, .1417+ksize, kFB+.04
-adf StanyDelay aFH, .1313+ksize, kFB+.05
-adg StanyDelay aFH, .1211+ksize, kFB+.06
-adh StanyDelay aFH, .1109+ksize, kFB+.07
+adb StanyDelay aFH, .1852+ksize, kFB+.0117
+adc StanyDelay aFH, .1731+ksize, kFB+.0227
+add StanyDelay aFH, .1526+ksize, kFB+.0337
+ade StanyDelay aFH, .1417+ksize, kFB+.0447
+adf StanyDelay aFH, .1313+ksize, kFB+.0557
+adg StanyDelay aFH, .1211+ksize, kFB+.0667
+adh StanyDelay aFH, .1109+ksize, kFB+.0777
 ;ain, kt, kwin,kdel, kmix, kz, ks xin
 
 ama ntrpol ada,adb*-1,.5
-apma MPitch ama, 12,.06,.2,.3,.6,1
+apma MPitch ama, 12,.0,.02,1,1,1
 amb ntrpol adc*-1,add,.5
-apmb MPitch ama, 12,.07,.2,.3,.6,1
+apmb MPitch ama, -12,.007,.002,.003,.006,.5
 amc ntrpol ade,adf*-1,.6
 amd ntrpol adg*-1,adh,.4
 
@@ -143,7 +145,7 @@ aFL moogladder aAe*1.5, kVF, .02
 
 aVL ntrpol  a1,aFL,kVWD
 aVR ntrpol a2, aFR, kVWD
-asig  poscil kFB, ksize, gisine
+asig  poscil krate, ksize, gisine
 aPL, aPR Panner aVL,aVR,k(asig)/4
 xout  aVL*1.5,aVR*1.5
 endop
@@ -156,19 +158,22 @@ kGain cabbageGetValue "gain"
 kMix cabbageGetValue "Mix"
 kBr cabbageGetValue "Bright"
 kSize cabbageGetValue "Size"
+kFb cabbageGetValue "FB"
+kRate cabbageGetValue "Rate"
 a1 inch 1
 a2 inch 2
 
 ;opcode Map, k, kkkkk
 ;kin, kx1, kx2, ky1, ky2   xin 
-kSizee Map kSize, 0,1,.001,.6
+;a1,a2,ksize,kFB,kVF,kVWD,khp xin
+kSizee Map kSize, 0,1,.008,.2
 kBrs Map kBr, 0,1,4500,0
 kBrh Map kBr, 0,1,0,500
-kSizes portk kSizee,kSizee+.001
-aoutl,aoutr StanyVerb a1,a2,kSizes,kSizes,8000-kBrs,1,kBrh
-aoutll,aoutrr StanyVerb aoutl,aoutr,kSizes-.2,kSizes-.5,7000-kBrs,.7,kBrh
-aoutlll,aoutrrr StanyVerb aoutll,aoutrr,kSizes-.3,kSizes-.6,5000-kBrs,.5,kBrh
-aoutllll,aoutrrrr StanyVerb aoutl,aoutr,kSizes-.4,kSizes-.7,5000-kBrs,.4,kBrh
+kSizes portk kSizee,kSizee+.01
+aoutl,aoutr StanyVerb a1,a2,kSizes,kFb-.07,8000-kBrs,1,kBrh,kRate
+aoutll,aoutrr StanyVerb a1,a2,kSizes-.02,kFb-.06,7000-kBrs,1,kBrh,kRate+.2
+aoutlll,aoutrrr StanyVerb a1,a2,kSizes-.03,kFb-.0793,5000-kBrs,1,kBrh,kRate+.3
+aoutllll,aoutrrrr StanyVerb a1,a2,kSizes-.04,kFb-.035,5000-kBrs,1,kBrh,kRate+.4
 kmixs portk kMix,kMix+.001
 averL ntrpol  a1,(aoutll+aoutlll+aoutllll)/2,kmixs
 averR ntrpol  a2,(aoutrr+aoutrrr+aoutrrrr)/2,kmixs
