@@ -122,9 +122,9 @@ adh StanyDelay aFH, .1109+ksize, kFB+.0777
 ;ain, kt, kwin,kdel, kmix, kz, ks xin
 
 ama ntrpol ada,adb*-1,.5
-apma MPitch ama, 12,.0,.02,1,1,1
+apma MPitch ama, 12,.0,.02,1,kFB,1
 amb ntrpol adc*-1,add,.5
-apmb MPitch ama, -12,.007,.002,.003,.006,.5
+apmb MPitch ama, -12,.007,.002,.003,kFB,.5
 amc ntrpol ade,adf*-1,.6
 amd ntrpol adg*-1,adh,.4
 
@@ -166,7 +166,7 @@ a2 inch 2
 ;opcode Map, k, kkkkk
 ;kin, kx1, kx2, ky1, ky2   xin 
 ;a1,a2,ksize,kFB,kVF,kVWD,khp xin
-kSizee Map kSize, 0,1,.008,.2
+kSizee Map kSize, 0,1,.008,.4
 kBrs Map kBr, 0,1,4500,0
 kBrh Map kBr, 0,1,0,500
 kSizes portk kSizee,kSizee+.01
